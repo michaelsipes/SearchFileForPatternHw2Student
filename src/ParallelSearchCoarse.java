@@ -21,7 +21,8 @@ public class ParallelSearchCoarse {
 		searcher.join();
 		long end = System.currentTimeMillis();
         System.out.println("Total number of lines  " + queue.getLines());
-		System.out.println("Total occurence of pattern  " + pattern + " is " + queue.getOccurances());
+        System.out.println("Total number of lines searched " + queue.numberOfLinesSearched);
+		System.out.println("Total occurence of pattern  " + pattern + " is " + queue.getOccurrences());
 		System.out.println("Time cost for concurrent solution is " + (end - start) + "ms");
 		
 	}

@@ -1,7 +1,6 @@
 
 import java.util.LinkedList;
 import java.util.PriorityQueue;
-import java.util.Queue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -11,19 +10,20 @@ public class SharedQueue {
     private int count;
     private final int MAXSIZE = 100;
     private LinkedList<String> queue;
-    private int occurances;
-    private int var4;
+    private int occurrences;
     private boolean endOfFile = false;
     private boolean isEmpty = false;
     private int numberOfLines;
     private PriorityQueue<String> realQueue;
+    public int numberOfLinesSearched;
 
     public SharedQueue(){
         queue = new LinkedList<String>();
-        occurances = 0;
-        var4 = 0;
+        occurrences = 0;
         numberOfLines = 0;
         realQueue = new PriorityQueue<String>();
+        count = 0;
+        numberOfLinesSearched = 0;
     }
 
     public synchronized void enqueue(String line) {
@@ -35,14 +35,11 @@ public class SharedQueue {
                 e.printStackTrace();
             }
         }
-        //if(!line.isEmpty() && !line.equals(" ")){
-            //queue.add(line);
-            realQueue.add(line);
-            count++;
-            numberOfLines++;
-            isEmpty = false;
-        //}
-        notify();
+        queue.addLast(line);
+        count++;
+        numberOfLines++;
+        isEmpty = false;
+        notifyAll();
     }
 
     public synchronized void dequeue(String regex){
@@ -57,8 +54,7 @@ public class SharedQueue {
         //to do work
         if(count > 0){
 
-            //String line = queue.removeLast();
-            String line = realQueue.remove();
+            String line = queue.removeFirst();
             count--;
             if(count == 0){
                 isEmpty = true;
@@ -66,14 +62,15 @@ public class SharedQueue {
             Pattern pattern = Pattern.compile(regex);
             Matcher  matcher = pattern.matcher(line);
             while (matcher.find()) {
-                occurances++;
+                occurrences++;
             }
-            notify();
+            numberOfLinesSearched++;
+            notifyAll();
         }
     }
 
-    public int getOccurances(){
-        return this.occurances;
+    public int getOccurrences(){
+        return this.occurrences;
     }
 
     public synchronized void setEndOfFile(){
