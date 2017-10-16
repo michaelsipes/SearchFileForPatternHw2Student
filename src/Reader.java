@@ -1,5 +1,4 @@
 import java.io.*;
-import java.util.Scanner;
 
 
 public class Reader implements Runnable{
@@ -26,12 +25,10 @@ public class Reader implements Runnable{
     @Override
     public void run() {
 
-        String var5;
-        int var6 = 0;
-        int var7;
+        String line;
         try {
-            for(var7 = 0; (var5 = read.readLine()) != null; ++var6) {
-                queue.enqueue(var5);
+            for(int i = 0; (line = read.readLine()) != null; ++i) {
+                queue.enqueue(line);
                 numberOfLines++;
             }
             queue.setEndOfFile();

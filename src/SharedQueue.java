@@ -21,7 +21,7 @@ public class SharedQueue {
         queue = new LinkedList<String>();
         occurrences = 0;
         numberOfLines = 0;
-        realQueue = new PriorityQueue<String>();
+        //realQueue = new PriorityQueue<String>();
         count = 0;
         numberOfLinesSearched = 0;
     }
@@ -43,30 +43,33 @@ public class SharedQueue {
     }
 
     public synchronized void dequeue(String regex){
-        while (count == 0 && !this.getEndOfFile()) {
-            try {
-                wait();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+        String line = "";
+        synchronized (this){
+            while (count == 0 && !this.getEndOfFile()) {
+                try {
+                    wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
-        }
-        //This check is in the case where the reader finishes and the searcher is sleeping and wakes up
-        //to do work
-        if(count > 0){
-
-            String line = queue.removeFirst();
-            count--;
-            if(count == 0){
-                isEmpty = true;
+            if(count > 0){
+                line = queue.removeFirst();
+                count--;
             }
-            Pattern pattern = Pattern.compile(regex);
-            Matcher  matcher = pattern.matcher(line);
-            while (matcher.find()) {
-                occurrences++;
-            }
-            numberOfLinesSearched++;
             notifyAll();
         }
+
+        //This check is in the case where the reader finishes and the searcher is sleeping and wakes up
+        //to do work
+        if(count == 0){
+            isEmpty = true;
+        }
+        Pattern pattern = Pattern.compile(regex);
+        Matcher  matcher = pattern.matcher(line);
+        while (matcher.find()) {
+            occurrences++;
+        }
+        numberOfLinesSearched++;
     }
 
     public int getOccurrences(){
@@ -78,11 +81,11 @@ public class SharedQueue {
         notifyAll();
     }
 
-    public synchronized boolean getEndOfFile(){
+    public boolean getEndOfFile(){
         return this.endOfFile;
     }
 
-    public synchronized boolean isEmpty(){
+    public boolean isEmpty(){
         return isEmpty;
     }
 
